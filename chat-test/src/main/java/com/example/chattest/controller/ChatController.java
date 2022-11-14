@@ -1,31 +1,29 @@
 package com.example.chattest.controller;
 
-
-import com.example.chattest.controller.model.Message;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.example.chattest.dto.ChatRoom;
+import com.example.chattest.service.ChatService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/chat")
 public class ChatController {
 
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
+    private final ChatService chatService;
 
-    @MessageMapping("/message") /* /app/message */
-    @SendTo("/chatroom/public")
-    public Message receivePublicMessage(@Payload Message message){
-        return message;
+    @PostMapping
+    public ChatRoom createRoom(@RequestParam String name){
+        return chatService.createRoom(name);
     }
 
-    @MessageMapping("/private-message")
-    public Message receivePrivateMessage(@Payload Message message){
-
-        simpMessagingTemplate.convertAndSendToUser(message.getReceiverName(),"/private",message);   /* /user/{userName}/private */
-        return message;
+    @GetMapping
+    public List<ChatRoom> findAllRoom(){
+        return chatService.findAllRoom();
     }
+
 
 }
